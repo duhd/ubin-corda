@@ -1,12 +1,12 @@
 buildscript {
-    ext.corda_release_version = '1.0.1-UBIN'
+    ext.corda_release_version = '1.0.0'
     ext.corda_gradle_plugins_version = '1.0.0'
     ext.kotlin_version = '1.1.51'
     ext.junit_version = '4.12'
     ext.quasar_version = '0.7.9'
 
     repositories {
-        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/ubin' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
         mavenLocal()
         mavenCentral()
         jcenter()
@@ -22,7 +22,7 @@ buildscript {
 }
 
 repositories {
-    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/ubin' }
+    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
     mavenLocal()
     mavenCentral()
     jcenter()
@@ -79,9 +79,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 
 task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
     directory "./build/nodes"
-    networkMap "O=MAS Regulator,L=Singapore,C=SG"
+    networkMap "O=MASREGULATOR,L=Singapore,C=SG"
     node {
-        name "O=MAS Regulator,L=Singapore,C=SG"
+        name "O=MASREGULATOR,L=Singapore,C=SG"
         advertisedServices = ["corda.notary.simple"]
         p2pPort 10001
         rpcPort 10002
@@ -100,7 +100,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
     }
     node {
-        name "O=MAS,L=Singapore,C=SG"
+        name "O=MASGSGSG,L=Singapore,C=SG"
         advertisedServices = []
         p2pPort 10004
         rpcPort 10005
@@ -137,6 +137,63 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
                     "net.corda:corda-finance:$corda_release_version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
     }
+    node {
+        name "O=BANKA,L=Singapore,C=SG"
+        advertisedServices = []
+        p2pPort 10010
+        rpcPort 10011
+        webPort 10012
+        cordapps = ["$project.group:base:$project.version",
+                    "$project.group:cash:$project.version",
+                    "$project.group:obligation:$project.version",
+                    "$project.group:detect:$project.version",
+                    "$project.group:plan:$project.version",
+                    "$project.group:execute:$project.version",
+                    "$project.group:redeem:$project.version",
+                    "$project.group:pledge:$project.version",
+                    "$project.group:account:$project.version",
+                    "$project.group:api:$project.version",
+                    "net.corda:corda-finance:$corda_release_version"]
+        rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
+    }
+    node {
+        name "O=BANKB,L=Singapore,C=SG"
+        advertisedServices = []
+        p2pPort 10013
+        rpcPort 10014
+        webPort 10015
+        cordapps = ["$project.group:base:$project.version",
+                    "$project.group:cash:$project.version",
+                    "$project.group:obligation:$project.version",
+                    "$project.group:detect:$project.version",
+                    "$project.group:plan:$project.version",
+                    "$project.group:execute:$project.version",
+                    "$project.group:redeem:$project.version",
+                    "$project.group:pledge:$project.version",
+                    "$project.group:account:$project.version",
+                    "$project.group:api:$project.version",
+                    "net.corda:corda-finance:$corda_release_version"]
+        rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
+    }
+    node {
+        name "O=BANKC,L=Singapore,C=SG"
+        advertisedServices = []
+        p2pPort 10016
+        rpcPort 10017
+        webPort 10018
+        cordapps = ["$project.group:base:$project.version",
+                    "$project.group:cash:$project.version",
+                    "$project.group:obligation:$project.version",
+                    "$project.group:detect:$project.version",
+                    "$project.group:plan:$project.version",
+                    "$project.group:execute:$project.version",
+                    "$project.group:redeem:$project.version",
+                    "$project.group:pledge:$project.version",
+                    "$project.group:account:$project.version",
+                    "$project.group:api:$project.version",
+                    "net.corda:corda-finance:$corda_release_version"]
+        rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
+    }    
 //    node {
 //        name "O=MUFG,L=Singapore,C=SG"
 //        advertisedServices = []

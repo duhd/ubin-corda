@@ -201,7 +201,7 @@ class ScenarioExceptional {
         println("--------------------------")
         println("LSM Run #1")
         println("--------------------------")
-        bank1.services.startFlow(StartLSMFlow()).resultFuture.getOrThrow()
+        //bank1.services.startFlow(StartLSMFlow()).resultFuture.getOrThrow() //duhd
         net.waitQuiescent()
         printCashBalances()
         println()

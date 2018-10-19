@@ -19,7 +19,7 @@ import java.util.*
 @InitiatingFlow
 class GetBalanceFlow : FlowLogic<BankModel>() {
     @Suspendable
-    override fun call() : BankModel {
+    override fun call(): BankModel {
         logger.info("Getting cash balance")
         val maybeBalance = serviceHub.getCashBalance(SGD)
         var balance = 0L
@@ -62,8 +62,8 @@ object BalanceByBanksFlow {
             val bankList = ArrayList<BankModel>()
             val networkParticipants = serviceHub.networkMapCache.allNodes
 
-            val filterBanksOnly = networkParticipants.filter {
-                nodeInfo -> nodeInfo.isNotary(serviceHub).not() && nodeInfo.isCentralBank().not() && nodeInfo.isRegulator().not() && nodeInfo.isMe(serviceHub.myInfo).not() && nodeInfo.isNetworkMap().not()
+            val filterBanksOnly = networkParticipants.filter { nodeInfo ->
+                nodeInfo.isNotary(serviceHub).not() && nodeInfo.isCentralBank().not() && nodeInfo.isRegulator().not() && nodeInfo.isMe(serviceHub.myInfo).not() && nodeInfo.isNetworkMap().not()
             }
 
             filterBanksOnly.forEach {
@@ -92,13 +92,14 @@ object BalanceByBanksFlow {
         override fun call() {
             val counterParty = session.counterparty
             logger.info("BalanceByBanksFlow.Responder: Requested balance from bank ${counterParty.name.organisation}")
-            if(counterParty.name != CENTRAL_PARTY_X500){
-                throw FlowException("Initiator is not central bank")
-            }
+            if (counterParty.name == CENTRAL_PARTY_X500) {
+                //throw FlowException("Initiator is not central bank")
 
-            session.receive<Unit>()
-            val allMyCash = serviceHub.vaultService.queryBy<Cash.State>().states
-            subFlow(SendStateAndRefFlow(session, allMyCash))
+                session.receive<Unit>()
+                val allMyCash = serviceHub.vaultService.queryBy<Cash.State>().states
+                subFlow(SendStateAndRefFlow(session, allMyCash))
+
+            }
         }
     }
 }
@@ -113,7 +114,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
     override fun call(): List<TransactionModel> {
         logger.info("GetTransactionHistory: Querying transaction snapshot")
         val transactionsSnapshot = serviceHub.validatedTransactions.track().snapshot
-        if(transactionsSnapshot.isEmpty()) return emptyList()
+        if (transactionsSnapshot.isEmpty()) return emptyList()
 
         val transactionsHistory = ArrayList<TransactionModel>()
         transactionsSnapshot.forEach {
@@ -121,7 +122,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
             var transType = ""
             val transId = it.tx.id.toString()
             var linearId: String? = null
-            var sender  = "Anonymous Sender"
+            var sender = "Anonymous Sender"
             var receiver = "Anonymous Receiver"
             var transactionAmount = 0.00
             var requestedDate = ""
@@ -129,8 +130,10 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
             var status: String? = null
 
             // Only 1 command in the TX
-            if(it.tx.commands.size == 1) {
-                if (selectedTransType != TRANSACTION_TYPE.TRANSFER.ordinal && selectedTransType != null){ return@forEach }
+            if (it.tx.commands.size == 1) {
+                if (selectedTransType != TRANSACTION_TYPE.TRANSFER.ordinal && selectedTransType != null) {
+                    return@forEach
+                }
                 /** Peer-to-peer fund transfer with Cash Move command - funds move bilaterally**/
                 if (it.tx.commands.any { it.value is Cash.Commands.Move }) {
                     logger.info("GetTransactionHistory: Querying Cash movement")
@@ -167,7 +170,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                     val senderParty = serviceHub.identityService.wellKnownPartyFromAnonymous(obligationState.borrower)
                     val receiverParty = serviceHub.identityService.wellKnownPartyFromAnonymous(obligationState.lender)
 
-                    if(senderParty != null && receiverParty != null) {
+                    if (senderParty != null && receiverParty != null) {
                         sender = senderParty.name.organisation
                         receiver = receiverParty.name.organisation
                     }
@@ -190,12 +193,14 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
             } // End command == 1 condtion
 
             // Only 2 commands in the TX
-            else if(it.tx.commands.size == 2) {
+            else if (it.tx.commands.size == 2) {
 
                 /** Obligation settlement - funds move in bilateral direction **/
                 if (it.tx.commands.any { it.value is Obligation.Settle }) {
                     logger.info("GetTransactionHistory: Querying Obligation settle movement")
-                    if (selectedTransType != TRANSACTION_TYPE.TRANSFER.ordinal && selectedTransType != null){ return@forEach }
+                    if (selectedTransType != TRANSACTION_TYPE.TRANSFER.ordinal && selectedTransType != null) {
+                        return@forEach
+                    }
                     val tlx = it.tx.toLedgerTransaction(serviceHub)
                     val inputObligations = tlx.inputsOfType<Obligation.State>()
 
@@ -213,7 +218,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                         val obligationReceiver = serviceHub.identityService.wellKnownPartyFromAnonymous(lender)
 
                         // I only add those that I either am the sender or receiver
-                        if(obligationSender != null && obligationReceiver != null){
+                        if (obligationSender != null && obligationReceiver != null) {
                             sender = obligationSender.name.organisation
                             receiver = obligationReceiver.name.organisation
                             val transaction = TransactionModel(
@@ -235,7 +240,9 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                  */
                 else if (it.tx.commands.any { it.value is Redeem.Issue }) {
                     logger.info("GetTransactionHistory: Querying Redeem issuance movement")
-                    if (selectedTransType != TRANSACTION_TYPE.REDEEM.ordinal && selectedTransType != null){ return@forEach }
+                    if (selectedTransType != TRANSACTION_TYPE.REDEEM.ordinal && selectedTransType != null) {
+                        return@forEach
+                    }
                     val ltx = it.tx.toLedgerTransaction(serviceHub)
                     val redeemStates = ltx.outputsOfType<Redeem.State>()
 
@@ -253,7 +260,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                     val receiverParty = serviceHub.identityService.wellKnownPartyFromAnonymous(anonymousApprover)
 
                     // Add tx into history
-                    if(receiverParty != null && senderParty != null ) {
+                    if (receiverParty != null && senderParty != null) {
                         val transaction = TransactionModel(
                                 transType = transType,
                                 transId = transId,
@@ -272,7 +279,9 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                      */
                 } else if (it.tx.commands.any { it.value is Pledge.Issue }) {
                     logger.info("GetTransactionHistory: Querying Pledge issuance movement")
-                    if (selectedTransType != TRANSACTION_TYPE.PLEDGE.ordinal && selectedTransType != null){ return@forEach }
+                    if (selectedTransType != TRANSACTION_TYPE.PLEDGE.ordinal && selectedTransType != null) {
+                        return@forEach
+                    }
                     val ltx = it.tx.toLedgerTransaction(serviceHub)
                     val pledgeStates = ltx.outputsOfType<Pledge.State>()
 
@@ -290,12 +299,12 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                     val senderParty = serviceHub.identityService.wellKnownPartyFromAnonymous(anonymousApprover)
 
                     // Add tx into history
-                    if(receiverParty != null && senderParty != null ) {
+                    if (receiverParty != null && senderParty != null) {
                         val transaction = TransactionModel(
                                 transType = transType,
                                 transId = transId,
                                 linearId = linearId,
-                                sender  = senderParty.name.organisation,
+                                sender = senderParty.name.organisation,
                                 receiver = receiverParty.name.organisation,
                                 transactionAmount = transactionAmount,
                                 requestedDate = requestedDate,
