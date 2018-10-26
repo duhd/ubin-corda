@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
 
-@Path("bank")
+@Path("otherbank")
 class BankApi(val services: CordaRPCOps) {
     companion object {
         private val logger: Logger = loggerFor<BankApi>()
