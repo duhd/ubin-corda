@@ -13,7 +13,8 @@ class ApiPlugin : WebServerPluginRegistry, SerializationWhitelist {
                 Function(::ObligationApi),
                 Function(::PledgeApi),
                 Function(::RedeemApi),
-                Function(::NettingApi))
+                Function(::NettingApi),
+                Function(::BankApi))
     override val whitelist: List<Class<*>> get() = listOf(
             java.security.cert.CertPathValidatorException.BasicReason::class.java
     )

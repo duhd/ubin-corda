@@ -55,6 +55,7 @@ dependencies {
     // CorDapp dependencies
     // Specify your cordapp's dependencies below, including dependent cordapps
     cordapp "net.corda:corda-finance:$corda_release_version"
+    cordapp project(":bank")
     cordapp project(":base")
     cordapp project(":cash")
     cordapp project(":obligation")
@@ -86,7 +87,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10001
         rpcPort 10002
         webPort 10003
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
@@ -105,7 +107,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10004
         rpcPort 10005
         webPort 10006
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
@@ -124,7 +127,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10007
         rpcPort 10008
         webPort 10009
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
@@ -143,7 +147,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10010
         rpcPort 10011
         webPort 10012
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
@@ -162,7 +167,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10013
         rpcPort 10014
         webPort 10015
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
@@ -181,7 +187,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10016
         rpcPort 10017
         webPort 10018
-        cordapps = ["$project.group:base:$project.version",
+        cordapps = ["$project.group:bank:$project.version",
+                    "$project.group:base:$project.version",
                     "$project.group:cash:$project.version",
                     "$project.group:obligation:$project.version",
                     "$project.group:detect:$project.version",
