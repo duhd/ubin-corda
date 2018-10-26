@@ -36,7 +36,7 @@ class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<String
         progressTracker.currentStep = ASKING_RATE_TO_SERVICE
         val accountNo = account.accountNo
         val maybeOtherParty = serviceHub.identityService.partiesFromName(account.X500Name, exactMatch = true)
-        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party")
+        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party: ${account.X500Name}")
         if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
         val otherParty = maybeOtherParty.single()
 
