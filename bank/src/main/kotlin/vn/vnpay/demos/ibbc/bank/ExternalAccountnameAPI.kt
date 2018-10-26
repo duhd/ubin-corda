@@ -35,7 +35,7 @@ object ExternalAccountnameAPI {
                         .type(MediaType.APPLICATION_JSON_TYPE)
                         .post(ClientResponse::class.java, mapper.writeValueAsString(value))
                 logger.info("Response from AccountNameURI " + response.status)
-                if (response.status != HttpStatus.CREATED_201) {
+                if (response.status != HttpStatus.OK_200) {
                     throw RuntimeException("Failed : HTTP error code : "
                             + response.status)
                 }
