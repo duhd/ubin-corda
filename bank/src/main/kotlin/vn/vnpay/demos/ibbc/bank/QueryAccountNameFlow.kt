@@ -2,10 +2,7 @@ package vn.vnpay.demos.ibbc.bank
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.demos.ubin2a.base.AccountModel
-import net.corda.core.flows.FlowLogic
-import net.corda.core.flows.FlowSession
-import net.corda.core.flows.InitiatedBy
-import net.corda.core.flows.InitiatingFlow
+import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.serialization.CordaSerializable
 import net.corda.core.utilities.ProgressTracker
@@ -21,6 +18,7 @@ import net.corda.core.utilities.unwrap
  *
  * @return a [String] account name, or `null` if account is unknown.
  */
+@StartableByRPC
 @InitiatingFlow
 class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<String?>() {
 
