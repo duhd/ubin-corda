@@ -1,6 +1,7 @@
 package vn.vnpay.demos.ibbc.bank
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.r3.demos.ubin2a.base.AccountModel
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
 import net.corda.core.node.ServiceHub
@@ -24,7 +25,7 @@ object ExternalAccountnameAPI {
             val logger = loggerFor<ExternalAccountnameAPI.Service>()
         }
 
-        fun queryAccountName(value: String): String {
+        fun queryAccountName(value: AccountModel): AccountModel {
             try {
                 val client = Client.create()
                 val AccountNameURI = getAccountNameURI("AccountNameURI")
@@ -39,10 +40,10 @@ object ExternalAccountnameAPI {
                     throw RuntimeException("Failed : HTTP error code : "
                             + response.status)
                 }
-                return response.getEntity(String::class.java)
+                return response.getEntity(AccountModel::class.java)
             } catch (ex: Exception) {
                 logger.error(ex.message)
-                return ""
+                return AccountModel(accountNo = "", accountName = "", bic = "", X500Name = "")
             }
         }
 

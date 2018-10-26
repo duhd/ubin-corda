@@ -20,7 +20,7 @@ import net.corda.core.utilities.unwrap
  */
 @StartableByRPC
 @InitiatingFlow
-class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<String?>() {
+class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<AccountModel?>() {
 
     private companion object {
 
@@ -31,17 +31,16 @@ class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<String
     override val progressTracker = ProgressTracker(ASKING_RATE_TO_SERVICE, RETURNING_RATE)
 
     @Suspendable
-    override fun call(): String? {
+    override fun call(): AccountModel {
 
         progressTracker.currentStep = ASKING_RATE_TO_SERVICE
-        val accountNo = account.accountNo
-        val maybeOtherParty = serviceHub.identityService.partiesFromName(account.X500Name, exactMatch = true)
-        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party: ${account.X500Name}")
+        val maybeOtherParty = serviceHub.identityService.partiesFromName(account.bic, exactMatch = true)
+        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party: ${account.bic}")
         if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
         val otherParty = maybeOtherParty.single()
 
         val session = initiateFlow(otherParty)
-        val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(accountNo))
+        val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(account))
 
         progressTracker.currentStep = RETURNING_RATE
         return resp.unwrap { it.name }
@@ -83,10 +82,10 @@ class QueryAccountNameFlowHandler(private val session: FlowSession) : FlowLogic<
  * Request object for [QueryAccountNameFlow].
  */
 @CordaSerializable
-data class QueryAccountNameRequest(val account: String)
+data class QueryAccountNameRequest(val account: AccountModel)
 
 /**
  * Response object for [QueryAccountNameFlow].
  */
 @CordaSerializable
-data class QueryAccountNameResponse(val name: String)
+data class QueryAccountNameResponse(val name: AccountModel)
