@@ -34,7 +34,8 @@ class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<Accoun
     override fun call(): AccountModel {
 
         progressTracker.currentStep = ASKING_RATE_TO_SERVICE
-        val maybeOtherParty = serviceHub.identityService.partiesFromName(account.bic, exactMatch = true)
+        val bic = account.bic ?: ""
+        val maybeOtherParty = serviceHub.identityService.partiesFromName(bic, exactMatch = true)
         if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party: ${account.bic}")
         if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
         val otherParty = maybeOtherParty.single()

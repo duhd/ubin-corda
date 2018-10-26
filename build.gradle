@@ -160,6 +160,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
                     "$project.group:api:$project.version",
                     "net.corda:corda-finance:$corda_release_version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": []]]
+
     }
     node {
         name "O=BANKB,L=Singapore,C=SG"
