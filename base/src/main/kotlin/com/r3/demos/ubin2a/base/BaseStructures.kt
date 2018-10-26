@@ -100,3 +100,10 @@ data class DeadlockModel(val statusCode: Int? = null,
                          val inDeadlock: Boolean? = null,
                          val notifiedDate: String? = null,
                          val updatedDate: String? = null)
+
+@CordaSerializable
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class AccountModel(var accountNo: String = "",
+                        var accountName: String = "",
+                        val bic: String = "",
+                        val X500Name: String = "")

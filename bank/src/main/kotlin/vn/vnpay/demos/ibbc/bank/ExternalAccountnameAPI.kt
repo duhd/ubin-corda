@@ -24,7 +24,7 @@ object ExternalAccountnameAPI {
             val logger = loggerFor<ExternalAccountnameAPI.Service>()
         }
 
-        fun approveRedeemInMEPS(value: String): String {
+        fun queryAccountName(value: String): String {
             try {
                 val client = Client.create()
                 val AccountNameURI = getAccountNameURI("AccountNameURI")

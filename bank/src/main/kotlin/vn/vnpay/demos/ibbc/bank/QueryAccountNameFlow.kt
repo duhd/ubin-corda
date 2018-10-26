@@ -1,6 +1,7 @@
 package vn.vnpay.demos.ibbc.bank
 
 import co.paralleluniverse.fibers.Suspendable
+import com.r3.demos.ubin2a.base.AccountModel
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.FlowSession
 import net.corda.core.flows.InitiatedBy
@@ -21,7 +22,7 @@ import net.corda.core.utilities.unwrap
  * @return a [String] account name, or `null` if account is unknown.
  */
 @InitiatingFlow
-class QueryAccountNameFlow(private val account: String, private val bank: Party) : FlowLogic<String?>() {
+class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<String?>() {
 
     private companion object {
 
@@ -35,8 +36,14 @@ class QueryAccountNameFlow(private val account: String, private val bank: Party)
     override fun call(): String? {
 
         progressTracker.currentStep = ASKING_RATE_TO_SERVICE
-        val session = initiateFlow(bank)
-        val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(account))
+        val accountNo = account.accountNo
+        val maybeOtherParty = serviceHub.identityService.partiesFromName(account.X500Name, exactMatch = true)
+        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party")
+        if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
+        val otherParty = maybeOtherParty.single()
+
+        val session = initiateFlow(otherParty)
+        val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(accountNo))
 
         progressTracker.currentStep = RETURNING_RATE
         return resp.unwrap { it.name }
@@ -66,7 +73,7 @@ class QueryAccountNameFlowHandler(private val session: FlowSession) : FlowLogic<
 
         progressTracker.currentStep = INVOKING_CORDA_SERVICE
         val AccountNameAPI = serviceHub.cordaService(ExternalAccountnameAPI.Service::class.java)
-        val name = AccountNameAPI.approveRedeemInMEPS(account)
+        val name = AccountNameAPI.queryAccountName(account)
 
         progressTracker.currentStep = RETURNING_RATE
 
@@ -84,4 +91,4 @@ data class QueryAccountNameRequest(val account: String)
  * Response object for [QueryAccountNameFlow].
  */
 @CordaSerializable
-data class QueryAccountNameResponse(val name: String?)
+data class QueryAccountNameResponse(val name: String)
