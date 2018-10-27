@@ -1,12 +1,14 @@
 package com.r3.demos.ubin2a.lsm
 
-import com.r3.demos.ubin2a.base.*
-import com.r3.demos.ubin2a.cash.Pay
-import com.r3.demos.ubin2a.detect.*
-import com.r3.demos.ubin2a.execute.*
 import com.r3.demos.ubin2a.account.DeadlockNotificationFlow
 import com.r3.demos.ubin2a.account.DeadlockService
 import com.r3.demos.ubin2a.account.StartLSMFlow
+import com.r3.demos.ubin2a.base.CENTRAL_PARTY_X500
+import com.r3.demos.ubin2a.base.REGULATOR_PARTY_X500
+import com.r3.demos.ubin2a.base.SGD
+import com.r3.demos.ubin2a.base.TemporaryKeyManager
+import com.r3.demos.ubin2a.detect.*
+import com.r3.demos.ubin2a.execute.*
 import com.r3.demos.ubin2a.obligation.IssueObligation
 import com.r3.demos.ubin2a.obligation.Obligation
 import com.r3.demos.ubin2a.obligation.PersistentObligationQueue
@@ -329,18 +331,18 @@ class ScenarioSix {
         printCashBalances()
         println()
 
-        bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank1.services.startFlow(Pay(bank3.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank1.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank1.services.startFlow(Pay(bank5.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-
-        bank2.services.startFlow(Pay(bank1.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank2.services.startFlow(Pay(bank3.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank2.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-
-        bank3.services.startFlow(Pay(bank1.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank3.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank3.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank3.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank5.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//
+//        bank2.services.startFlow(Pay(bank1.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank2.services.startFlow(Pay(bank3.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank2.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//
+//        bank3.services.startFlow(Pay(bank1.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank3.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank3.services.startFlow(Pay(bank4.info.chooseIdentity(), SGD(1), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
 
     }
 }

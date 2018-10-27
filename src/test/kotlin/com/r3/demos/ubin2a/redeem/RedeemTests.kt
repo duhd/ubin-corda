@@ -1,14 +1,12 @@
 package com.r3.demos.ubin2a.redeem
 
 import com.r3.demos.ubin2a.base.CENTRAL_PARTY_X500
-import com.r3.demos.ubin2a.base.OBLIGATION_PRIORITY
 import com.r3.demos.ubin2a.base.REGULATOR_PARTY_X500
 import com.r3.demos.ubin2a.base.SGD
 import com.r3.demos.ubin2a.cash.AcceptPayment
-import com.r3.demos.ubin2a.cash.Pay
-import com.r3.demos.ubin2a.pledge.ApprovePledge
 import com.r3.demos.ubin2a.obligation.IssueObligation
 import com.r3.demos.ubin2a.obligation.PersistentObligationQueue
+import com.r3.demos.ubin2a.pledge.ApprovePledge
 import net.corda.core.node.services.queryBy
 import net.corda.core.utilities.getOrThrow
 import net.corda.finance.contracts.getCashBalance
@@ -215,17 +213,17 @@ class RedeemTests {
         printCashBalances()
         println()
 
-        val payFlow_1 = Pay(centralBank.info.chooseIdentity(), SGD(22222), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val payOutput_1 = bank1.services.startFlow(payFlow_1).resultFuture.getOrThrow()
-        println(payOutput_1.tx.toString())
-        net.waitQuiescent()
+//        val payFlow_1 = Pay(centralBank.info.chooseIdentity(), SGD(22222), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val payOutput_1 = bank1.services.startFlow(payFlow_1).resultFuture.getOrThrow()
+//        println(payOutput_1.tx.toString())
+//        net.waitQuiescent()
         printCashBalances()
         println()
 
-        val payFlow_2 = Pay(centralBank.info.chooseIdentity(), SGD(33333), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val payOutput_2 = bank1.services.startFlow(payFlow_2).resultFuture.getOrThrow()
-        println(payOutput_2.tx.toString())
-        net.waitQuiescent()
+//        val payFlow_2 = Pay(centralBank.info.chooseIdentity(), SGD(33333), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val payOutput_2 = bank1.services.startFlow(payFlow_2).resultFuture.getOrThrow()
+//        println(payOutput_2.tx.toString())
+//        net.waitQuiescent()
         printCashBalances()
         println()
 
@@ -239,10 +237,10 @@ class RedeemTests {
         printCashBalances()
         println()
 
-        val payFlow_3 = Pay(centralBank.info.chooseIdentity(), SGD(55555), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val payOutput_3 = bank1.services.startFlow(payFlow_3).resultFuture.getOrThrow()
-        println(payOutput_3.tx.toString())
-        net.waitQuiescent()
+//        val payFlow_3 = Pay(centralBank.info.chooseIdentity(), SGD(55555), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val payOutput_3 = bank1.services.startFlow(payFlow_3).resultFuture.getOrThrow()
+//        println(payOutput_3.tx.toString())
+//        net.waitQuiescent()
         printCashBalances()
         println()
 

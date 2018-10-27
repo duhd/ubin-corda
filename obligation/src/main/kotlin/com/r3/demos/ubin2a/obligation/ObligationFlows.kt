@@ -641,6 +641,7 @@ class PostIssueObligationFlow(val value: TransactionModel) : FlowLogic<Transacti
                 sender = sender.name.organisation,
                 receiver = receiver.name.organisation,
                 transactionAmount = state.amount.quantity.to2Decimals(),
+                userContent = value.userContent, //duhd
                 currency = state.amount.token.currencyCode.toString(),
                 priority = value.priority)
     }

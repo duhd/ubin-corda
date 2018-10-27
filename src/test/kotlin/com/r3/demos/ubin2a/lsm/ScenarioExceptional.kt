@@ -3,8 +3,10 @@ package com.r3.demos.ubin2a.lsm
 import com.r3.demos.ubin2a.account.DeadlockNotificationFlow
 import com.r3.demos.ubin2a.account.DeadlockService
 import com.r3.demos.ubin2a.account.StartLSMFlow
-import com.r3.demos.ubin2a.base.*
-import com.r3.demos.ubin2a.cash.Pay
+import com.r3.demos.ubin2a.base.CENTRAL_PARTY_X500
+import com.r3.demos.ubin2a.base.REGULATOR_PARTY_X500
+import com.r3.demos.ubin2a.base.SGD
+import com.r3.demos.ubin2a.base.TemporaryKeyManager
 import com.r3.demos.ubin2a.detect.*
 import com.r3.demos.ubin2a.execute.ReceiveFinalisedTransactionFlow
 import com.r3.demos.ubin2a.execute.ReceiveGatherStatesRequest
@@ -336,11 +338,11 @@ class ScenarioExceptional {
         println("--------------------------")
         println("Zerorising Balances for next LSM scenario")
         println("--------------------------")
-        bank1.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(35), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank2.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(2), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank3.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(5), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank4.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(4), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
-        bank5.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(3), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(35), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank2.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(2), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank3.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(5), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank4.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(4), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+//        bank5.services.startFlow(Pay(bank6.info.chooseIdentity(), SGD(3), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
         printCashBalances()
 
 

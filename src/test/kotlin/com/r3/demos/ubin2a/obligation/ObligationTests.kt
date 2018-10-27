@@ -3,7 +3,6 @@ package com.r3.demos.ubin2a.obligation
 import com.r3.demos.ubin2a.base.*
 import com.r3.demos.ubin2a.cash.AcceptPayment
 import com.r3.demos.ubin2a.pledge.ApprovePledge
-import com.r3.demos.ubin2a.cash.Pay
 import com.r3.demos.ubin2a.ubin2aTestHelpers.allObligations
 import com.r3.demos.ubin2a.ubin2aTestHelpers.createObligation
 import com.r3.demos.ubin2a.ubin2aTestHelpers.printObligations
@@ -320,7 +319,7 @@ class ObligationTests {
         assert(queueItem.first().priority == OBLIGATION_PRIORITY.HIGH.ordinal)
 
         // Try to send another payment transfer of high priority
-        bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1000L), OBLIGATION_PRIORITY.HIGH.ordinal)).resultFuture.getOrThrow()
+//        bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1000L), OBLIGATION_PRIORITY.HIGH.ordinal)).resultFuture.getOrThrow()
         val outgoingQueue2 = bank1.services.startFlow(GetQueue.OutgoingUnconsumed()).resultFuture.getOrThrow()
         val balance1 = bank1.database.transaction { bank1.services.getCashBalance(sgd) }
         net.waitQuiescent()

@@ -56,6 +56,7 @@ fun List<ObligationModel>.toTransactionModel(services: CordaRPCOps): List<Transa
                         sender = it.sender.toParty(services).name.organisation,
                         receiver = it.receiver.toParty(services).name.organisation,
                         transactionAmount = it.transactionAmount,
+                        userContent = it.userContent,//duhd
                         priority = priority,
                         currency = it.currency,
                         status = status
@@ -79,6 +80,7 @@ fun ObligationModel.toTransactionModel(services: CordaRPCOps): TransactionModel 
             sender = this.sender.toParty(services).name.organisation,
             receiver = this.receiver.toParty(services).name.organisation,
             transactionAmount = this.transactionAmount,
+            userContent = this.userContent,//duhd
             priority = priority,
             currency = this.currency,
             status = status)

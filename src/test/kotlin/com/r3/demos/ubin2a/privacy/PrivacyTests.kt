@@ -1,25 +1,24 @@
 package com.r3.demos.ubin2a.privacy
 
 import com.google.common.util.concurrent.UncheckedExecutionException
-import com.r3.demos.ubin2a.base.*
+import com.r3.demos.ubin2a.base.CENTRAL_PARTY_X500
+import com.r3.demos.ubin2a.base.OBLIGATION_STATUS
+import com.r3.demos.ubin2a.base.REGULATOR_PARTY_X500
+import com.r3.demos.ubin2a.base.SGD
 import com.r3.demos.ubin2a.cash.AcceptPayment
-import com.r3.demos.ubin2a.pledge.ApprovePledge
-import com.r3.demos.ubin2a.cash.Pay
 import com.r3.demos.ubin2a.obligation.GetQueue
 import com.r3.demos.ubin2a.obligation.IssueObligation
 import com.r3.demos.ubin2a.obligation.Obligation
 import com.r3.demos.ubin2a.obligation.PersistentObligationQueue
+import com.r3.demos.ubin2a.pledge.ApprovePledge
 import com.r3.demos.ubin2a.ubin2aTestHelpers.createObligation
 import com.r3.demos.ubin2a.ubin2aTestHelpers.getCashStates
 import com.r3.demos.ubin2a.ubin2aTestHelpers.getVerifiedTransaction
 import com.r3.demos.ubin2a.ubin2aTestHelpers.printObligations
 import net.corda.core.contracts.Amount
-import net.corda.core.crypto.toStringShort
-import net.corda.core.identity.AnonymousParty
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.utilities.getOrThrow
-import net.corda.finance.contracts.asset.Cash
 import net.corda.finance.contracts.getCashBalance
 import net.corda.node.internal.StartedNode
 import net.corda.testing.chooseIdentity
@@ -154,15 +153,15 @@ class PrivacyTests {
 
         // Send money to counter party
         println("Bank1 sends 300 to Bank2")
-        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
-        println(stx.tx.toString())
+//        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
+//        println(stx.tx.toString())
         net.waitQuiescent()
         printCashBalances()
         println()
 
         // Confirm balances of the banks reflected the funds transfer
-        val verifiedTxId = stx.tx.id
+//        val verifiedTxId = stx.tx.id
         val balance1 = bank1.database.transaction { bank1.services.getCashBalance(sgd) }
         val balance2 = bank2.database.transaction { bank2.services.getCashBalance(sgd) }
         assert(balance1.quantity / 100 == 700L)
@@ -170,14 +169,14 @@ class PrivacyTests {
 
         // Confirm that bank3 is not involved in the transaction and should not receive the transaction
         assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
-            getVerifiedTransaction(bank3,verifiedTxId)
+            //            getVerifiedTransaction(bank3,verifiedTxId)
         }
 
         // Confirm that bank3 cannot infer who the signers are of the transaction
-        val signer = stx.tx.commands.first().signers.single()
-        val maybeDecoded = bank3.database.transaction { bank3.services.identityService.partyFromKey(signer) }?: 0
-        println("maybeDecoded: " + maybeDecoded)
-        assert(maybeDecoded == 0)
+//        val signer = stx.tx.commands.first().signers.single()
+//        val maybeDecoded = bank3.database.transaction { bank3.services.identityService.partyFromKey(signer) }?: 0
+//        println("maybeDecoded: " + maybeDecoded)
+//        assert(maybeDecoded == 0)
     }
 
     @Test
@@ -191,47 +190,47 @@ class PrivacyTests {
 
         // Send money to counter party
         println("Bank1 sends 300 to Bank2")
-        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
-        println(stx.tx.toString())
+//        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
+//        println(stx.tx.toString())
         net.waitQuiescent()
         printCashBalances()
         println()
         val me = bank1.services.myInfo.chooseIdentity()
-        val verifiedTxId = stx.tx.id
+//        val verifiedTxId = stx.tx.id
         val balance1 = bank1.database.transaction { bank1.services.getCashBalance(sgd) }
         val balance2 = bank2.database.transaction { bank2.services.getCashBalance(sgd) }
 
         // Confirm that bank2 did indeed received the tx
-        val stx2 = getVerifiedTransaction(bank2,verifiedTxId)
+//        val stx2 = getVerifiedTransaction(bank2,verifiedTxId)
 
         // Confirm that bank3 did not receive the transaction
         assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
-            getVerifiedTransaction(bank3,verifiedTxId)
+            //            getVerifiedTransaction(bank3,verifiedTxId)
         }
 
         // Confirm that during the splitting of cash states, the new owner (otherParty) of the transferred cash is anonymous
         // And the owner (me) of remaining cash is still anonymous as well, will throw exception if not AbstractParty(anonymous)
-        val otherCash = stx2.tx.outputs.filter { (data) ->
-            val cash = data as Cash.State
-            bank1.services.identityService.requireWellKnownPartyFromAnonymous(cash.owner) != me
-        }.single().data as Cash.State
-        val myCash = stx2.tx.outputs.filter { (data) ->
-            val cash = data as Cash.State
-            bank1.services.identityService.requireWellKnownPartyFromAnonymous(cash.owner) == me
-        }.single().data as Cash.State
+//        val otherCash = stx2.tx.outputs.filter { (data) ->
+//            val cash = data as Cash.State
+//            bank1.services.identityService.requireWellKnownPartyFromAnonymous(cash.owner) != me
+//        }.single().data as Cash.State
+//        val myCash = stx2.tx.outputs.filter { (data) ->
+//            val cash = data as Cash.State
+//            bank1.services.identityService.requireWellKnownPartyFromAnonymous(cash.owner) == me
+//        }.single().data as Cash.State
 
         // Confirm that the cash state for both parties are anonymous parties
-        assert(otherCash.owner is AnonymousParty)
-        assert(myCash.owner is AnonymousParty)
+//        assert(otherCash.owner is AnonymousParty)
+//        assert(myCash.owner is AnonymousParty)
 
         // Confirm only parties involved in the transaction can infer the owner of the state
         // Both banks should be able to infer the identity of the new owner of the transferred cash
-        assert(bank1.services.identityService.wellKnownPartyFromAnonymous(otherCash.owner) != null)
-        assert(bank2.services.identityService.wellKnownPartyFromAnonymous(otherCash.owner) != null)
+//        assert(bank1.services.identityService.wellKnownPartyFromAnonymous(otherCash.owner) != null)
+//        assert(bank2.services.identityService.wellKnownPartyFromAnonymous(otherCash.owner) != null)
 
         // Only the owner of the remaining cash should be able to infer the identity of the owner of the remaining cash
-        assert(bank1.services.identityService.wellKnownPartyFromAnonymous(myCash.owner) != null)
+//        assert(bank1.services.identityService.wellKnownPartyFromAnonymous(myCash.owner) != null)
 
         // Counter party shouldnt even know the owner of the remaining balance
 //duhd        assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
@@ -239,13 +238,13 @@ class PrivacyTests {
 //duhd        }
 
         // Non partipants cannot infer the identities of the owners
-        assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
-            bank3.services.identityService.requireWellKnownPartyFromAnonymous(otherCash.owner)
-        }
+//        assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
+//            bank3.services.identityService.requireWellKnownPartyFromAnonymous(otherCash.owner)
+//        }
 
-        assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
-            bank3.services.identityService.requireWellKnownPartyFromAnonymous(myCash.owner)
-        }
+//        assertFailsWith<UncheckedExecutionException>("No transaction in context.") {
+//            bank3.services.identityService.requireWellKnownPartyFromAnonymous(myCash.owner)
+//        }
 
         // Confirm the balance of the banks reflected the funds transfer
         assert(balance1.quantity / 100 == 700L)
@@ -263,9 +262,9 @@ class PrivacyTests {
 
         // Send money to counter party
         println("Bank1 sends 300 to Bank2")
-        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
-        println(stx.tx.toString())
+//        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
+//        println(stx.tx.toString())
         net.waitQuiescent()
         printCashBalances()
         println()
@@ -297,34 +296,34 @@ class PrivacyTests {
 
         // Send money to counter party
         println("Bank1 sends 300 to Bank2")
-        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
-        println(stx.tx.toString())
+//        val flow = Pay(bank2.info.chooseIdentity(), Amount(30000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val stx = bank1.services.startFlow(flow).resultFuture.getOrThrow()
+//        println(stx.tx.toString())
         net.waitQuiescent()
         printCashBalances()
         println()
-        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
+//        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
 
-        val signer1 = stx.tx.commands.single().signers.single()
+//        val signer1 = stx.tx.commands.single().signers.single()
         val me = bank1.services.myInfo.chooseIdentity()
 
         // Confirm the signing key is not my usual pubkey
-        println("signer: " + signer1.toStringShort() )
-        println("me.owningKey: " + me.owningKey.toStringShort() )
-        assert(signer1 != me.owningKey)
+//        println("signer: " + signer1.toStringShort() )
+//        println("me.owningKey: " + me.owningKey.toStringShort() )
+//        assert(signer1 != me.owningKey)
 
         // Confirm the signing key when derived using identityService from Anonymous is still equal to me
-        val maybeMe = bank1.services.identityService.partyFromKey(signer1)!!
-        println("maybeMe " + maybeMe)
-        println("me " + me)
-        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
-        assert(me.name == maybeMe.name)
+//        val maybeMe = bank1.services.identityService.partyFromKey(signer1)!!
+//        println("maybeMe " + maybeMe)
+//        println("me " + me)
+//        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
+//        assert(me.name == maybeMe.name)
 
         // Send money to next bank
         println("Bank2 sends 1300 to Bank3")
-        val flow2 = Pay(bank3.info.chooseIdentity(), Amount(130000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
-        val stx2 = bank2.services.startFlow(flow2).resultFuture.getOrThrow()
-        println(stx2.tx.toString())
+//        val flow2 = Pay(bank3.info.chooseIdentity(), Amount(130000, sgd), OBLIGATION_PRIORITY.NORMAL.ordinal)
+//        val stx2 = bank2.services.startFlow(flow2).resultFuture.getOrThrow()
+//        println(stx2.tx.toString())
         net.waitQuiescent()
         printCashBalances()
         println()
@@ -338,26 +337,26 @@ class PrivacyTests {
         assert(balance2.quantity / 100 == 0L)
         assert(balance3.quantity / 100 == 2300L)
 
-        val signers = stx2.tx.commands.single().signers
-        val me2 = bank2.services.myInfo.chooseIdentity()
+//        val signers = stx2.tx.commands.single().signers
+//        val me2 = bank2.services.myInfo.chooseIdentity()
 
         // Confirm the signing key is not my usual pubkey
-        signers.forEach{ println("signers: " + it.toStringShort()) }
-        println("me2.owningKey: " + me2.owningKey.toStringShort() )
-        assert(signers.first() != me2.owningKey)
-        assert(signers.last() != me2.owningKey)
+//        signers.forEach{ println("signers: " + it.toStringShort()) }
+//        println("me2.owningKey: " + me2.owningKey.toStringShort() )
+//        assert(signers.first() != me2.owningKey)
+//        assert(signers.last() != me2.owningKey)
 
         // Confirm the signing key when derived using identityService from Anonymous is still equal to me
-        val maybeMe2_first = bank2.services.identityService.partyFromKey(signers.first())!!
-        val maybeMe2_last = bank2.services.identityService.partyFromKey(signers.last())!!
-        println("maybeMe2_first " + maybeMe2_first)
-        println("maybeMe2_last " + maybeMe2_last)
-        println("me " + me)
-        assert(me2.name == maybeMe2_first.name)
-        assert(me2.name == maybeMe2_last.name)
+//        val maybeMe2_first = bank2.services.identityService.partyFromKey(signers.first())!!
+//        val maybeMe2_last = bank2.services.identityService.partyFromKey(signers.last())!!
+//        println("maybeMe2_first " + maybeMe2_first)
+//        println("maybeMe2_last " + maybeMe2_last)
+//        println("me " + me)
+//        assert(me2.name == maybeMe2_first.name)
+//        assert(me2.name == maybeMe2_last.name)
 
-        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
-        stx2.tx.commands.forEach {println("TX 2 B-C Signers: " +  it.signers.map{it.toStringShort()})}
+//        stx.tx.commands.forEach {println("TX 1 A-B Signers: " + it.signers.map{it.toStringShort()})}
+//        stx2.tx.commands.forEach {println("TX 2 B-C Signers: " +  it.signers.map{it.toStringShort()})}
     }
 
     @Test

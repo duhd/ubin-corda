@@ -18,6 +18,7 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.seconds
+import net.corda.core.utilities.unwrap
 import net.corda.finance.contracts.asset.Cash
 import net.corda.finance.contracts.getCashBalances
 import net.corda.finance.flows.CashIssueFlow
@@ -56,6 +57,7 @@ class SelfIssueCashFlow(val amount: Amount<Currency>) : FlowLogic<Cash.State>() 
 @InitiatingFlow
 class Pay(val otherParty: Party,
           val amount: Amount<Currency>,
+          val transactionInfo: TransactionModel, //duhd
           val priority: Int,
           val anonymous: Boolean = true) : FlowLogic<SignedTransaction>() {
 
@@ -110,7 +112,8 @@ class Pay(val otherParty: Party,
             val partSignedTx = serviceHub.signInitialTransaction(spendTx, keysForSigning)
             val session = initiateFlow(otherParty)
             subFlow(IdentitySyncFlow.Send(session, partSignedTx.tx))
-            
+            session.send(transactionInfo) //duhd
+
             // Collect signatures
             progressTracker.currentStep = COLLECTING
             // Finalise the transaction
@@ -139,6 +142,9 @@ class AcceptPayment(val otherFlow: FlowSession) : FlowLogic<Unit>() {
     override fun call() {
         logger.info("Pay.AcceptPayment: Syncing identities")
         subFlow(IdentitySyncFlow.Receive(otherFlow))
+
+        val (transactionInfo) = otherFlow.receive<TransactionModel>().unwrap { it }
+        logger.info("TransactionInfo: " + transactionInfo.toString())
     }
 }
 
@@ -156,10 +162,10 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
         }
         val maybeOtherParty = serviceHub.identityService.partiesFromName(value.receiver!!, exactMatch = true)
         if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party")
-        if(maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
+        if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
         val otherParty = maybeOtherParty.single()
         val transferAmount = SGD(value.transactionAmount!!)
-        val stx = subFlow(Pay(otherParty, transferAmount, value.priority!!))
+        val stx = subFlow(Pay(otherParty, transferAmount, value, value.priority!!)) //duhd
 
         // If Pay flow successfully moved cash state, the output state is of type Cash.State
         // Model the response based on successful transfer fo funds
@@ -176,6 +182,7 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
                         sender = sender.name.organisation,
                         receiver = receiver.name.organisation,
                         transactionAmount = state.amount.quantity.to2Decimals(),
+                        userContent = value.userContent, //duhd
                         currency = state.amount.token.product.toString(),
                         status = OBLIGATION_STATUS.SETTLED.name.toLowerCase(),
                         priority = value.priority)
@@ -191,6 +198,7 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
                         sender = sender.name.organisation,
                         receiver = receiver.name.organisation,
                         transactionAmount = state.amount.quantity.to2Decimals(),
+                        userContent = value.userContent, //duhd
                         currency = state.amount.token.currencyCode.toString(),
                         status = OBLIGATION_STATUS.ACTIVE.name.toLowerCase(),
                         priority = value.priority)

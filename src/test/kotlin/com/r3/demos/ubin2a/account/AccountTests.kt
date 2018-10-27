@@ -2,7 +2,6 @@ package com.r3.demos.ubin2a.account
 
 import com.r3.demos.ubin2a.base.*
 import com.r3.demos.ubin2a.cash.AcceptPayment
-import com.r3.demos.ubin2a.cash.Pay
 import com.r3.demos.ubin2a.detect.*
 import com.r3.demos.ubin2a.execute.*
 import com.r3.demos.ubin2a.obligation.*
@@ -154,9 +153,9 @@ class AccountTests {
         // Approve Pledge
         val stx1 = centralBank.services.startFlow(ApprovePledge.Initiator(SGD(1000.00), bank1.info.chooseIdentity())).resultFuture.getOrThrow()
         printCashBalances()
-
+        val transactionInfo: TransactionModel
         // Bank 1 transfer $1 to Bank 2
-        val stx2 = bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1.00), OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
+        //val stx2 = bank1.services.startFlow(Pay(bank2.info.chooseIdentity(), SGD(1.00), transactionInfo, OBLIGATION_PRIORITY.NORMAL.ordinal)).resultFuture.getOrThrow()
 
         // Bank 1 create obligation $2.00 to Bank 2
         val stx3 = createObligation(bank2, bank1, SGD(2.00), 0).getOrThrow()

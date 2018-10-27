@@ -66,6 +66,7 @@ data class ObligationModel(var transType: Int = TRANSACTION_TYPE.OBLIGATION.ordi
                            var sender: PublicKey,
                            var receiver: PublicKey,
                            var transactionAmount: Double = 0.00,
+                           var userContent: String = "{}",
                            var priority: Int = -1,
                            var currency: String = "",
                            var status: Int = -1)
@@ -79,6 +80,7 @@ data class TransactionModel(var transType: String? = null,
                             var sender: String? = null,
                             var receiver: String? = null,
                             var transactionAmount: Double? = null,
+                            var userContent: String = "{}", //duhd - JSON: noi dung data EndUser: tk gửi, tk nhận, mã hoá đơn, ghi chú
                             var priority: Int? = null,
                             var requestedDate: String? = null,
                             var updatedDate: String? = null,
