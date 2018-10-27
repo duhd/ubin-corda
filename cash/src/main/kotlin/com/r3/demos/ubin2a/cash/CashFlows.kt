@@ -57,7 +57,6 @@ class SelfIssueCashFlow(val amount: Amount<Currency>) : FlowLogic<Cash.State>() 
 @InitiatingFlow
 class Pay(val otherParty: Party,
           val amount: Amount<Currency>,
-          val transactionInfo: TransactionModel, //duhd
           val priority: Int,
           val anonymous: Boolean = true) : FlowLogic<SignedTransaction>() {
 
@@ -112,7 +111,6 @@ class Pay(val otherParty: Party,
             val partSignedTx = serviceHub.signInitialTransaction(spendTx, keysForSigning)
             val session = initiateFlow(otherParty)
             subFlow(IdentitySyncFlow.Send(session, partSignedTx.tx))
-            session.send(transactionInfo) //duhd
 
             // Collect signatures
             progressTracker.currentStep = COLLECTING
@@ -142,10 +140,6 @@ class AcceptPayment(val otherFlow: FlowSession) : FlowLogic<Unit>() {
     override fun call() {
         logger.info("Pay.AcceptPayment: Syncing identities")
         subFlow(IdentitySyncFlow.Receive(otherFlow))
-        val transactionInfo: TransactionModel
-        transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
-        logger.info("TransactionInfo: " + transactionInfo)
-        logger.info("TransactionInfo: " + transactionInfo.userContent)
     }
 }
 
@@ -166,19 +160,20 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
         if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
         val otherParty = maybeOtherParty.single()
         val transferAmount = SGD(value.transactionAmount!!)
-        val stx = subFlow(Pay(otherParty, transferAmount, value, value.priority!!)) //duhd
+        val stx = subFlow(Pay(otherParty, transferAmount, value.priority!!)) //duhd
 
         // If Pay flow successfully moved cash state, the output state is of type Cash.State
         // Model the response based on successful transfer fo funds
         // Else model the response based on Obligation.State that was issued
         val txId = stx.tx.id
+        val transactionInfo: TransactionModel
         when {
             stx.tx.commands.none { it.value == (Obligation.Issue()) } -> {
                 logger.info("PostTransfersFlow: Transfer successful. Returning transaction details")
                 val state = stx.tx.outputsOfType<Cash.State>().first()
                 val sender = serviceHub.identityService.partyFromKey(stx.tx.commands.first().signers.first())!!
                 val receiver = serviceHub.identityService.requireWellKnownPartyFromAnonymous(state.owner)
-                return TransactionModel(
+                transactionInfo = TransactionModel(
                         transId = txId.toString(),
                         sender = sender.name.organisation,
                         receiver = receiver.name.organisation,
@@ -193,7 +188,7 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
                 val state = stx.tx.outputsOfType<Obligation.State>().first()
                 val sender = serviceHub.identityService.requireWellKnownPartyFromAnonymous(state.borrower)
                 val receiver = serviceHub.identityService.requireWellKnownPartyFromAnonymous(state.lender)
-                return TransactionModel(
+                transactionInfo = TransactionModel(
                         transId = txId.toString(),
                         linearId = state.linearId.toString(),
                         sender = sender.name.organisation,
@@ -206,5 +201,25 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
             }
             else -> throw IllegalStateException("Unexpected State exception: " + stx.tx.outputs.first())
         }
+        //Thong bao chuyen tien thanh cong toi Ben nhan
+        val session = initiateFlow(otherParty)
+        session.send(transactionInfo) //duhd
+
+        return transactionInfo
+    }
+}
+
+/**
+ * The other side of the above flow. For the purposes of this PoC, we won't add any additional checking.
+ */
+@InitiatingFlow
+@InitiatedBy(PostTransfersFlow::class)
+class PostTransfersFlowHandler(val otherFlow: FlowSession) : FlowLogic<Unit>() {
+    @Suspendable
+    override fun call() {
+        logger.info("Transfer Funds Successed")
+        val transactionInfo: TransactionModel
+        transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
+        logger.info("TransactionInfo: " + transactionInfo)
     }
 }
