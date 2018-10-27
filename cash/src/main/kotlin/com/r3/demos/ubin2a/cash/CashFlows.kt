@@ -142,9 +142,10 @@ class AcceptPayment(val otherFlow: FlowSession) : FlowLogic<Unit>() {
     override fun call() {
         logger.info("Pay.AcceptPayment: Syncing identities")
         subFlow(IdentitySyncFlow.Receive(otherFlow))
-
-        val (transactionInfo) = otherFlow.receive<TransactionModel>().unwrap { it }
-        logger.info("TransactionInfo: " + transactionInfo.toString())
+        val transactionInfo: TransactionModel
+        transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
+        logger.info("TransactionInfo: " + transactionInfo)
+        logger.info("TransactionInfo: " + transactionInfo.userContent)
     }
 }
 
