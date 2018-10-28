@@ -149,6 +149,7 @@ class GetTransactionHistory(val selectedTransType: Int? = null) : FlowLogic<List
                     updatedDate = Date(it.tx.timeWindow!!.midpoint!!.toEpochMilli()).toSimpleString()
 
 
+
                     if (firstSigner != null && newCashOwner != null) {
                         sender = firstSigner.name.organisation
                         receiver = newCashOwner.name.organisation
