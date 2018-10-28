@@ -181,7 +181,7 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
                         sender = sender.name.organisation,
                         receiver = receiver.name.organisation,
                         transactionAmount = state.amount.quantity.to2Decimals(),
-                        userContent = value.userContent.toString(), //duhd
+                        userContent = value.userContent, //duhd
                         currency = state.amount.token.product.toString(),
                         status = OBLIGATION_STATUS.SETTLED.name.toLowerCase(),
                         priority = value.priority)
@@ -200,7 +200,7 @@ class PostTransfersFlow(val value: TransactionModel) : FlowLogic<TransactionMode
                         sender = sender.name.organisation,
                         receiver = receiver.name.organisation,
                         transactionAmount = state.amount.quantity.to2Decimals(),
-                        userContent = value.userContent.toString(), //duhd
+                        userContent = value.userContent, //duhd
                         currency = state.amount.token.currencyCode.toString(),
                         status = OBLIGATION_STATUS.ACTIVE.name.toLowerCase(),
                         priority = value.priority)
@@ -227,5 +227,6 @@ class PostTransfersFlowHandler(val otherFlow: FlowSession) : FlowLogic<Unit>() {
         val transactionInfo: TransactionModel
         transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
         logger.info("TransactionInfo: " + transactionInfo)
+        logger.info("UserContent: " + transactionInfo.userContent)
     }
 }
