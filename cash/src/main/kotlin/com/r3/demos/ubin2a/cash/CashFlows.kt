@@ -227,6 +227,6 @@ class PostTransfersFlowHandler(val otherFlow: FlowSession) : FlowLogic<Unit>() {
         val transactionInfo: TransactionModel
         transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
         logger.info("TransactionInfo: " + transactionInfo)
-        logger.info("UserContent: " + transactionInfo.userContent)
+        logger.info("UserContent: " + transactionInfo.userContent.toString())
     }
 }
