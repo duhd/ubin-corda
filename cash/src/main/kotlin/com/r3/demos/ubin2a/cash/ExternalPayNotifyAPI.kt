@@ -29,7 +29,7 @@ object ExternalPayNotifyAPI {
             try {
                 val client = Client.create()
                 val mapper = ObjectMapper()
-                val msg = "{\"chat_id\":\"-1001281556940\",\"text\":\"" + mapper.writeValueAsString(value) + "\"}"
+                val msg = "{\"chat_id\":\"-1001263295205\",\"text\":\"" + mapper.writeValueAsString(value) + "\"}"
                 val PayNotifyURI = getPayNotifyURI("PayNotifyURI")
                 logger.info("PayNotify URI from properties " + PayNotifyURI)
                 val webResource = client.resource(PayNotifyURI)
