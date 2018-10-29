@@ -30,9 +30,9 @@ object ExternalPayNotifyAPI {
                 val client = Client.create()
                 val mapper = ObjectMapper()
                 val re = Regex("\"")
-                val re1 = Regex("\\\\\"")
+                val re1 = Regex("\\\\")
                 var msg = re1.replace(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value), "")
-                msg = re.replace(msg, "\\\\")
+                msg = re.replace(msg, "\\\\\"")
                 msg = "{\"chat_id\":\"-1001263295205\",\"text\":\"$msg\"}"
 
                 val PayNotifyURI = getPayNotifyURI("PayNotifyURI")
