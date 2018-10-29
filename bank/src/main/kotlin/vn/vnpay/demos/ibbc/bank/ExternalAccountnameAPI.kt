@@ -1,9 +1,6 @@
 package vn.vnpay.demos.ibbc.bank
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.r3.demos.ubin2a.base.AccountModel
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
@@ -43,11 +40,11 @@ object ExternalAccountnameAPI {
                     throw RuntimeException("Failed : HTTP error code : "
                             + response.status)
                 }
-                val result = response.getEntity(String::class.java)
-                val map = jacksonObjectMapper()
-                map.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-                val accountData = map.readValue<AccountModel>(result)
-                return accountData
+                val result = response.getEntity(AccountModel::class.java)
+//                val map = jacksonObjectMapper()
+//                map.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+//                val accountData = map.readValue<AccountModel>(result)
+                return result
             } catch (ex: Exception) {
                 logger.error(ex.message)
                 return AccountModel(accountNo = "", accountName = "", bic = "", X500Name = "")
