@@ -1,6 +1,7 @@
 package com.r3.demos.ubin2a.cash
 
 import co.paralleluniverse.fibers.Suspendable
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.r3.demos.ubin2a.base.*
 import com.r3.demos.ubin2a.obligation.GetQueue
 import com.r3.demos.ubin2a.obligation.IssueObligation
@@ -226,7 +227,9 @@ class PostTransfersFlowHandler(val otherFlow: FlowSession) : FlowLogic<Unit>() {
         logger.info("Transfer Funds Successed")
         val transactionInfo: TransactionModel
         transactionInfo = otherFlow.receive<TransactionModel>().unwrap { it }
-        logger.info("TransactionInfo: " + transactionInfo)
-        logger.info("UserContent: " + transactionInfo.userContent)
+        val mapper = ObjectMapper()
+        logger.info("TransactionInfo: " + mapper.writeValueAsString(transactionInfo))
+        val payNotifyAPI = serviceHub.cordaService(ExternalPayNotifyAPI.Service::class.java)
+        payNotifyAPI.PayNotify(transactionInfo)
     }
 }

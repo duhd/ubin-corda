@@ -1,8 +1,7 @@
-package vn.vnpay.demos.ibbc.bank
+package com.r3.demos.ubin2a.cash
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.r3.demos.ubin2a.base.AccountModel
+import com.r3.demos.ubin2a.base.TransactionModel
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
 import net.corda.core.node.ServiceHub
@@ -17,40 +16,40 @@ import java.util.*
 import javax.ws.rs.core.MediaType
 
 
-object ExternalAccountnameAPI {
+object ExternalPayNotifyAPI {
 
     @CordaService
     class Service(val services: ServiceHub) : SingletonSerializeAsToken() {
 
         private companion object {
-            val logger = loggerFor<ExternalAccountnameAPI.Service>()
+            val logger = loggerFor<ExternalPayNotifyAPI.Service>()
         }
 
-        fun queryAccountName(value: AccountModel): AccountModel {
+        fun PayNotify(value: TransactionModel) {
             try {
                 val client = Client.create()
-                val AccountNameURI = getAccountNameURI("AccountNameURI")
-                logger.info("AccountName URI from properties " + AccountNameURI)
-                val webResource = client.resource(AccountNameURI)
                 val mapper = ObjectMapper()
+                val msg = "{\"chat_id\":\"-1001281556940\",\"text\":\"" + mapper.writeValueAsString(value) + "\"}"
+                val PayNotifyURI = getPayNotifyURI("PayNotifyURI")
+                logger.info("PayNotify URI from properties " + PayNotifyURI)
+                val webResource = client.resource(PayNotifyURI)
                 val response = webResource.accept(MediaType.APPLICATION_JSON)
                         .type(MediaType.APPLICATION_JSON_TYPE)
-                        .post(ClientResponse::class.java, mapper.writeValueAsString(value))
-                logger.info("Response from AccountNameURI " + response.status)
+                        .post(ClientResponse::class.java, msg)
+                logger.info("Response from PayNotifyURI " + response.status)
                 if (response.status != HttpStatus.OK_200) {
                     throw RuntimeException("Failed : HTTP error code : "
                             + response.status)
+                } else {
+                    logger.info("PayNotify successed to " + value.receiver)
                 }
-                val result = response.getEntity(String::class.java)
-                return mapper.readValue<AccountModel>(result)
             } catch (ex: Exception) {
                 logger.error(ex.message)
-                return AccountModel(accountNo = "", accountName = "", bic = "", X500Name = "")
             }
         }
 
         // Try to read config properties to get the approve redeem URI
-        fun getAccountNameURI(value: String): String {
+        fun getPayNotifyURI(value: String): String {
 
             val prop = Properties()
             var input: InputStream? = null
