@@ -36,15 +36,17 @@ class QueryAccountNameFlow(private val account: AccountModel) : FlowLogic<Accoun
         progressTracker.currentStep = ASKING_RATE_TO_SERVICE
         val bic = account.bic ?: ""
         val maybeOtherParty = serviceHub.identityService.partiesFromName(bic, exactMatch = true)
-        if (maybeOtherParty.size != 1) throw IllegalArgumentException("Unknown Party: ${account.bic}")
-        if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
-        val otherParty = maybeOtherParty.single()
+        if (maybeOtherParty.size != 1) {
+            return AccountModel(accountNo = "", accountName = "Bank Not Found", bic = "", X500Name = "")
+        } else {
+            if (maybeOtherParty.first() == ourIdentity) throw IllegalArgumentException("Failed requirement: The payer and payee cannot be the same identity")
+            val otherParty = maybeOtherParty.single()
+            val session = initiateFlow(otherParty)
+            val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(account))
 
-        val session = initiateFlow(otherParty)
-        val resp = session.sendAndReceive<QueryAccountNameResponse>(QueryAccountNameRequest(account))
-
-        progressTracker.currentStep = RETURNING_RATE
-        return resp.unwrap { it.name }
+            progressTracker.currentStep = RETURNING_RATE
+            return resp.unwrap { it.name }
+        }
     }
 }
 
