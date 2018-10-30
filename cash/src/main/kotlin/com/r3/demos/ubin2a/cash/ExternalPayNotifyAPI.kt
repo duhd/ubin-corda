@@ -29,25 +29,18 @@ object ExternalPayNotifyAPI {
             try {
                 val client = Client.create()
                 val mapper = ObjectMapper()
-                val re = Regex("\"")
-                val re1 = Regex("\\\\")
-                var msg = re1.replace(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value), "")
-                msg = re.replace(msg, "\\\\\"")
-                msg = "{\"chat_id\":\"-1001263295205\",\"text\":\"$msg\"}"
-
                 val PayNotifyURI = getPayNotifyURI("PayNotifyURI")
-                logger.info(msg)
                 logger.info("PayNotify URI from properties " + PayNotifyURI)
                 val webResource = client.resource(PayNotifyURI)
                 val response = webResource.accept(MediaType.APPLICATION_JSON)
                         .type(MediaType.APPLICATION_JSON_TYPE)
-                        .post(ClientResponse::class.java, msg)
+                        .post(ClientResponse::class.java, mapper.writeValueAsString(value))
                 logger.info("Response from PayNotifyURI " + response.status)
                 if (response.status != HttpStatus.OK_200) {
                     throw RuntimeException("Failed : HTTP error code : "
                             + response.status)
                 } else {
-                    logger.info("PayNotify successed to " + value.receiver)
+                    logger.info("PayNotify successed to " + value.receiver + ", response " + response.getEntity(String::class.java))
                 }
             } catch (ex: Exception) {
                 logger.error(ex.message)
